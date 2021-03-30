@@ -1,3 +1,9 @@
+0.3.0	|	Release date: **30.03.2021**
+============================================
+* New Features:
+  - Add Command Options Support
+  - Rename Changes file to CHANGELOG.md and code refactoring of the script.
+
 0.2.0	|	Release date: **11.10.2020**
 ============================================
 * New Features:
