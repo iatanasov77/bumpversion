@@ -12,6 +12,7 @@ $editor				= '/usr/bin/vim';
 $changesRowPrefix	= '* ';
 $initialVersion		= '0.0.0';
 $tagPrefix          = 'v';
+$opt				= getopt( 'dh' );
 
 /**
  * SUPPORT VARS PASSED BY REFERENCE
@@ -24,11 +25,19 @@ $suggestedVersion;
  * MAIN SCRIPT
  * ////////////////////////////////////
  */
+if ( isset( $opt['h'] ) ) { // Display Help
+    echo Usage() . "\n";
+    exit( 0 );
+}
 evalNewVersion( $lastVersion, $suggestedVersion );
 
 $changes    = fetchChanges();
-applyChanges( $changes );
+if ( isset( $opt['d'] ) ) { // Dry-Run: Only Display Current Version and Changes
+    echo $changes;
+    exit( 0 );
+}
 
+applyChanges( $changes );
 file_put_contents( $versionFile, $suggestedVersion );
 
 // Commit VERSION and CHANGELOG.md files
@@ -109,3 +118,22 @@ function applyChanges( $changes )
     exec( "mv $tempChangesFile $changesFile" );
 }
 
+/**
+ * Print Usage
+ */
+function Usage()
+{
+	$usage = "
+============================================================================================================================================ \n
+= Usage \n
+============================ \n
+= \n
+= -h	Display this help. \n
+= \n
+= -d	Dry-Run: Only display Current Version and last changes without write files. \n
+= \n
+============================================================================================================================================ \n
+";
+
+	return $usage;
+}
