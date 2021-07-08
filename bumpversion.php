@@ -52,7 +52,7 @@ exec( sprintf( 'git commit -m "Version bump to %s"', $suggestedVersion ) );
 
 function evalNewVersion( &$lastVersion, &$suggestedVersion)
 {
-    global $versionFile, $initialVersion;
+    global $versionFile, $initialVersion, $opt;
     
     if( ! file_exists( $versionFile ) )
     {
@@ -68,9 +68,11 @@ function evalNewVersion( &$lastVersion, &$suggestedVersion)
     $versionPatch		= 0;
     $suggestedVersion	= sprintf( "%d.%d.%d", $versionMajor, $versionMinor, $versionPatch );
     
-    printf( "Enter a version number [%s]: ", $suggestedVersion );
-    $input				= trim( fgets( STDIN ) );
-    $suggestedVersion   = empty( $input ) ? $suggestedVersion : $input;
+    if ( ! isset( $opt['d'] ) ) { // Dry-Run: Only Display Current Version and Changes
+        printf( "Enter a version number [%s]: ", $suggestedVersion );
+        $input				= trim( fgets( STDIN ) );
+        $suggestedVersion   = empty( $input ) ? $suggestedVersion : $input;
+    }
 }
 
 function fetchChanges()

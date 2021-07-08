@@ -1,3 +1,9 @@
+0.4.1	|	Release date: **08.07.2021**
+============================================
+* Bug Fixes:
+  - Not Ask For Version in DryRun Mode.
+
+
 0.4.0	|	Release date: **08.07.2021**
 ============================================
 * New Features:
