@@ -67,6 +67,7 @@ function evalNewVersion( &$lastVersion, &$suggestedVersion)
     $versionMinor++;
     $versionPatch		= 0;
     $suggestedVersion	= sprintf( "%d.%d.%d", $versionMajor, $versionMinor, $versionPatch );
+    
     printf( "Enter a version number [%s]: ", $suggestedVersion );
     $input				= trim( fgets( STDIN ) );
     $suggestedVersion   = empty( $input ) ? $suggestedVersion : $input;
@@ -74,19 +75,26 @@ function evalNewVersion( &$lastVersion, &$suggestedVersion)
 
 function fetchChanges()
 {
-    global $changesRowPrefix, $initialVersion, $lastVersion, $suggestedVersion, $tagPrefix;
+    global $changesRowPrefix, $initialVersion, $lastVersion, $suggestedVersion, $tagPrefix, $opt;
     
     // Fetch GIT CHANGES , edit its and prepend in the CHANGES file
     $gitLogCommand		= ( $lastVersion === $initialVersion )
                             ? sprintf( 'git log --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"' )
                             : sprintf( 'git log --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"  %s%s...HEAD', $tagPrefix, $lastVersion );
     
-    $changes			= sprintf(
+    if ( isset( $opt['d'] ) ) { // Dry-Run: Only Display Current Version and Changes
+        $changes			= sprintf(
+                            "DryRun ( Display Changes Only )\n================================\n* Commits:\n%s\n\n",
+                            shell_exec( $gitLogCommand )
+                        );
+    } else {
+        $changes			= sprintf(
                             "%s\t|\tRelease date: **%s**\n============================================\n* New Features:\n* Bug-Fixes:\n* Commits:\n%s\n\n",
                             $suggestedVersion,
                             date( "d.m.Y" ),
                             shell_exec( $gitLogCommand )
                         );
+    }
     
     return $changes;
 }
