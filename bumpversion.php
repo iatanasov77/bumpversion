@@ -82,8 +82,8 @@ function fetchChanges( &$oldChanges )
     
     // Fetch GIT CHANGES , edit its and prepend in the CHANGES file
     $gitLogCommand		= ( $lastVersion === $initialVersion )
-                            ? sprintf( 'git log --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"' )
-                            : sprintf( 'git log --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"  %s%s...HEAD', $tagPrefix, $lastVersion );
+                            ? sprintf( 'git log --reverse --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"' )
+                            : sprintf( 'git log --reverse --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"  %s%s...HEAD', $tagPrefix, $lastVersion );
     
     if ( isset( $opt['d'] ) ) { // Dry-Run: Only Display Current Version and Changes
         $changes			= sprintf(
