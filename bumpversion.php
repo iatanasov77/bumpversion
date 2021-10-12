@@ -12,7 +12,8 @@ $editor				= '/usr/bin/vim';
 $changesRowPrefix	= '* ';
 $initialVersion		= '0.0.0';
 $tagPrefix          = 'v';
-$opt				= getopt( 'dh' );
+$versionSeparator   = '============================================';
+$opt				= getopt( 'dmh' );
 
 /**
  * SUPPORT VARS PASSED BY REFERENCE
@@ -32,10 +33,12 @@ if ( isset( $opt['h'] ) ) { // Display Help
 evalNewVersion( $lastVersion, $suggestedVersion );
 
 $oldChanges = file_exists( $changesFile ) ? file_get_contents( $changesFile ) : '';
-$changes    = fetchChanges( $oldChanges );
+$changes    = fetchChanges();
 if ( isset( $opt['d'] ) ) { // Dry-Run: Only Display Current Version and Changes
     echo $changes;
     exit( 0 );
+} else if ( isset( $opt['m'] ) ) {
+    mergeBugFixChanges( $changes, $oldChanges );
 }
 
 applyChanges( $changes, $oldChanges );
@@ -76,37 +79,52 @@ function evalNewVersion( &$lastVersion, &$suggestedVersion)
     }
 }
 
-function fetchChanges( &$oldChanges )
+function fetchChanges()
 {
-    global $changesRowPrefix, $initialVersion, $lastVersion, $suggestedVersion, $tagPrefix, $opt;
+    global $versionSeparator, $changesRowPrefix, $initialVersion, $lastVersion, $suggestedVersion, $tagPrefix, $opt;
     
     // Fetch GIT CHANGES , edit its and prepend in the CHANGES file
     $gitLogCommand		= ( $lastVersion === $initialVersion )
                             ? sprintf( 'git log --reverse --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"' )
-                            : sprintf( 'git log --reverse --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"  %s%s...HEAD', $tagPrefix, $lastVersion );
+                            : sprintf( 'git log --reverse --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"  %s%s...HEAD', $tagPrefix, trim( $lastVersion ) );
     
     if ( isset( $opt['d'] ) ) { // Dry-Run: Only Display Current Version and Changes
         $changes			= sprintf(
-                            "DryRun ( Display Changes Only )\n================================\n* Commits:\n%s\n\n",
+                            "DryRun ( Display Changes Only )\n%s\n* Commits:\n%s\n\n",
+                            $versionSeparator,
                             shell_exec( $gitLogCommand )
                         );
     } else {
-        $isBugfixVersion    = intval( end( ( explode( '.', $suggestedVersion, 2 ) ) ) ) > 0;
-        if ( $isBugfixVersion ) {
-            
-        } else {
-            
-        }
-        
         $changes			= sprintf(
-                            "%s\t|\tRelease date: **%s**\n============================================\n* New Features:\n* Bug-Fixes:\n* Commits:\n%s\n\n",
+                            "%s\t|\tRelease date: **%s**\n%s\n* New Features:\n* Bug-Fixes:\n* Commits:\n%s\n\n",
                             $suggestedVersion,
                             date( "d.m.Y" ),
+                            $versionSeparator,
                             shell_exec( $gitLogCommand )
                         );
     }
     
     return $changes;
+}
+
+function mergeBugFixChanges( &$changes, &$oldChanges )
+{
+    global $changesFile, $versionSeparator;
+    
+    $lines          = file( $changesFile );
+    $nextVersionRow = '';
+    foreach ( $lines as $k => $line ) {
+        if ( $k > 1 && $line == $versionSeparator ) {
+            $nextVersionRow = $line[$k-1];
+        }
+    }
+    
+    if ( ! empty( $nextVersionRow ) ) {
+        $previousVersionChanges = substr( $oldChanges, 0, strpos( $oldChanges, $nextVersionRow ) );
+        
+        $changes                = $previousVersionChanges . PHP_EOL . PHP_EOL . PHP_EOL . PHP_EOL . $changes;
+        $oldChanges             = str_replace( $previousVersionChanges, '', $oldChanges );
+    }
 }
 
 function applyChanges( $changes, $oldChanges )

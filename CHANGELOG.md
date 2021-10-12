@@ -1,3 +1,10 @@
+1.0.0	|	Release date: **12.10.2021**
+============================================
+* New Features:
+  - Create cli option to merge bugfix changes.
+  - Create function to merge New Changes with last version Changes.
+
+
 0.4.2	|	Release date: **12.10.2021**
 ============================================
 * New Features:
