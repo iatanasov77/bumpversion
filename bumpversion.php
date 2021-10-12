@@ -91,6 +91,13 @@ function fetchChanges( &$oldChanges )
                             shell_exec( $gitLogCommand )
                         );
     } else {
+        $isBugfixVersion    = intval( end( ( explode( '.', $suggestedVersion, 2 ) ) ) ) > 0;
+        if ( $isBugfixVersion ) {
+            
+        } else {
+            
+        }
+        
         $changes			= sprintf(
                             "%s\t|\tRelease date: **%s**\n============================================\n* New Features:\n* Bug-Fixes:\n* Commits:\n%s\n\n",
                             $suggestedVersion,
