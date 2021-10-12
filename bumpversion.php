@@ -31,13 +31,14 @@ if ( isset( $opt['h'] ) ) { // Display Help
 }
 evalNewVersion( $lastVersion, $suggestedVersion );
 
-$changes    = fetchChanges();
+$oldChanges = file_exists( $changesFile ) ? file_get_contents( $changesFile ) : '';
+$changes    = fetchChanges( $oldChanges );
 if ( isset( $opt['d'] ) ) { // Dry-Run: Only Display Current Version and Changes
     echo $changes;
     exit( 0 );
 }
 
-applyChanges( $changes );
+applyChanges( $changes, $oldChanges );
 file_put_contents( $versionFile, $suggestedVersion );
 
 // Commit VERSION and CHANGELOG.md files
@@ -75,14 +76,14 @@ function evalNewVersion( &$lastVersion, &$suggestedVersion)
     }
 }
 
-function fetchChanges()
+function fetchChanges( &$oldChanges )
 {
     global $changesRowPrefix, $initialVersion, $lastVersion, $suggestedVersion, $tagPrefix, $opt;
     
     // Fetch GIT CHANGES , edit its and prepend in the CHANGES file
     $gitLogCommand		= ( $lastVersion === $initialVersion )
-                            ? sprintf( 'git log --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"' )
-                            : sprintf( 'git log --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"  %s%s...HEAD', $tagPrefix, $lastVersion );
+                            ? sprintf( 'git log --reverse --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"' )
+                            : sprintf( 'git log --reverse --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"  %s%s...HEAD', $tagPrefix, $lastVersion );
     
     if ( isset( $opt['d'] ) ) { // Dry-Run: Only Display Current Version and Changes
         $changes			= sprintf(
@@ -90,6 +91,13 @@ function fetchChanges()
                             shell_exec( $gitLogCommand )
                         );
     } else {
+        $isBugfixVersion    = intval( end( ( explode( '.', $suggestedVersion, 2 ) ) ) ) > 0;
+        if ( $isBugfixVersion ) {
+            
+        } else {
+            
+        }
+        
         $changes			= sprintf(
                             "%s\t|\tRelease date: **%s**\n============================================\n* New Features:\n* Bug-Fixes:\n* Commits:\n%s\n\n",
                             $suggestedVersion,
@@ -101,7 +109,7 @@ function fetchChanges()
     return $changes;
 }
 
-function applyChanges( $changes )
+function applyChanges( $changes, $oldChanges )
 {
     global $tempChangesFile, $changesFile, $editor;
     
@@ -122,8 +130,6 @@ function applyChanges( $changes )
     // Old Way: Not work
     //exec( "$editor $tempChangesFile" );
     
-    
-    $oldChanges     = file_exists( $changesFile ) ? file_get_contents( $changesFile ) : '';
     file_put_contents( $tempChangesFile, $oldChanges, FILE_APPEND );
     exec( "mv $tempChangesFile $changesFile" );
 }
