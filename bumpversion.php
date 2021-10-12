@@ -12,7 +12,7 @@ $editor				= '/usr/bin/vim';
 $changesRowPrefix	= '* ';
 $initialVersion		= '0.0.0';
 $tagPrefix          = 'v';
-$opt				= getopt( 'dh' );
+$opt				= getopt( 'dmh' );
 
 /**
  * SUPPORT VARS PASSED BY REFERENCE
@@ -32,10 +32,12 @@ if ( isset( $opt['h'] ) ) { // Display Help
 evalNewVersion( $lastVersion, $suggestedVersion );
 
 $oldChanges = file_exists( $changesFile ) ? file_get_contents( $changesFile ) : '';
-$changes    = fetchChanges( $oldChanges );
+$changes    = fetchChanges();
 if ( isset( $opt['d'] ) ) { // Dry-Run: Only Display Current Version and Changes
     echo $changes;
     exit( 0 );
+} else if ( isset( $opt['m'] ) ) {
+    mergeBugFixChanges( $changes, $oldChanges );
 }
 
 applyChanges( $changes, $oldChanges );
@@ -76,7 +78,7 @@ function evalNewVersion( &$lastVersion, &$suggestedVersion)
     }
 }
 
-function fetchChanges( &$oldChanges )
+function fetchChanges()
 {
     global $changesRowPrefix, $initialVersion, $lastVersion, $suggestedVersion, $tagPrefix, $opt;
     
@@ -91,13 +93,6 @@ function fetchChanges( &$oldChanges )
                             shell_exec( $gitLogCommand )
                         );
     } else {
-        $isBugfixVersion    = intval( end( ( explode( '.', $suggestedVersion, 2 ) ) ) ) > 0;
-        if ( $isBugfixVersion ) {
-            
-        } else {
-            
-        }
-        
         $changes			= sprintf(
                             "%s\t|\tRelease date: **%s**\n============================================\n* New Features:\n* Bug-Fixes:\n* Commits:\n%s\n\n",
                             $suggestedVersion,
@@ -107,6 +102,18 @@ function fetchChanges( &$oldChanges )
     }
     
     return $changes;
+}
+
+function mergeBugFixChanges( &$changes, &$oldChanges )
+{
+    global $lastVersion, $suggestedVersion;
+    
+    $isBugfixVersion    = intval( end( ( explode( '.', $suggestedVersion, 2 ) ) ) ) > 0;
+    if ( $isBugfixVersion ) {
+        
+    } else {
+        
+    }
 }
 
 function applyChanges( $changes, $oldChanges )
