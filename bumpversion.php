@@ -12,6 +12,7 @@ $editor				= '/usr/bin/vim';
 $changesRowPrefix	= '* ';
 $initialVersion		= '0.0.0';
 $tagPrefix          = 'v';
+$versionSeparator   = '================================';
 $opt				= getopt( 'dmh' );
 
 /**
@@ -80,7 +81,7 @@ function evalNewVersion( &$lastVersion, &$suggestedVersion)
 
 function fetchChanges()
 {
-    global $changesRowPrefix, $initialVersion, $lastVersion, $suggestedVersion, $tagPrefix, $opt;
+    global $versionSeparator, $changesRowPrefix, $initialVersion, $lastVersion, $suggestedVersion, $tagPrefix, $opt;
     
     // Fetch GIT CHANGES , edit its and prepend in the CHANGES file
     $gitLogCommand		= ( $lastVersion === $initialVersion )
@@ -89,12 +90,12 @@ function fetchChanges()
     
     if ( isset( $opt['d'] ) ) { // Dry-Run: Only Display Current Version and Changes
         $changes			= sprintf(
-                            "DryRun ( Display Changes Only )\n================================\n* Commits:\n%s\n\n",
+                            "DryRun ( Display Changes Only )\n%s\n* Commits:\n%s\n\n",
                             shell_exec( $gitLogCommand )
                         );
     } else {
         $changes			= sprintf(
-                            "%s\t|\tRelease date: **%s**\n============================================\n* New Features:\n* Bug-Fixes:\n* Commits:\n%s\n\n",
+                            "%s\t|\tRelease date: **%s**\n%s\n* New Features:\n* Bug-Fixes:\n* Commits:\n%s\n\n",
                             $suggestedVersion,
                             date( "d.m.Y" ),
                             shell_exec( $gitLogCommand )
@@ -106,13 +107,21 @@ function fetchChanges()
 
 function mergeBugFixChanges( &$changes, &$oldChanges )
 {
-    global $lastVersion, $suggestedVersion;
+    global $changesFile, $versionSeparator;
     
-    $isBugfixVersion    = intval( end( ( explode( '.', $suggestedVersion, 2 ) ) ) ) > 0;
-    if ( $isBugfixVersion ) {
+    $lines          = file( $changesFile );
+    $nextVersionRow = '';
+    foreach ( $lines as $k => $line ) {
+        if ( $k > 1 && $line == $versionSeparator ) {
+            $nextVersionRow = $line[$k-1];
+        }
+    }
+    
+    if ( ! empty( $nextVersionRow ) ) {
+        $previousVersionChanges = substr( $oldChanges, 0, strpos( $oldChanges, $nextVersionRow ) );
         
-    } else {
-        
+        $changes                = $previousVersionChanges . PHP_EOL . PHP_EOL . PHP_EOL . PHP_EOL . $changes;
+        $oldChanges             = str_replace( $previousVersionChanges, '', $oldChanges );
     }
 }
 
@@ -138,7 +147,7 @@ function applyChanges( $changes, $oldChanges )
     //exec( "$editor $tempChangesFile" );
     
     file_put_contents( $tempChangesFile, $oldChanges, FILE_APPEND );
-    exec( "mv $tempChangesFile $changesFile" );
+    //exec( "mv $tempChangesFile $changesFile" );
 }
 
 /**
