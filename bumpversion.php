@@ -12,7 +12,7 @@ $editor				= '/usr/bin/vim';
 $changesRowPrefix	= '* ';
 $initialVersion		= '0.0.0';
 $tagPrefix          = 'v';
-$versionSeparator   = '================================';
+$versionSeparator   = '============================================';
 $opt				= getopt( 'dmh' );
 
 /**
@@ -86,11 +86,12 @@ function fetchChanges()
     // Fetch GIT CHANGES , edit its and prepend in the CHANGES file
     $gitLogCommand		= ( $lastVersion === $initialVersion )
                             ? sprintf( 'git log --reverse --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"' )
-                            : sprintf( 'git log --reverse --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"  %s%s...HEAD', $tagPrefix, $lastVersion );
+                            : sprintf( 'git log --reverse --pretty=format:"%%x09[%%ai][Commit: %%H]%%n%%x09  %%s"  %s%s...HEAD', $tagPrefix, trim( $lastVersion ) );
     
     if ( isset( $opt['d'] ) ) { // Dry-Run: Only Display Current Version and Changes
         $changes			= sprintf(
                             "DryRun ( Display Changes Only )\n%s\n* Commits:\n%s\n\n",
+                            $versionSeparator,
                             shell_exec( $gitLogCommand )
                         );
     } else {
@@ -98,6 +99,7 @@ function fetchChanges()
                             "%s\t|\tRelease date: **%s**\n%s\n* New Features:\n* Bug-Fixes:\n* Commits:\n%s\n\n",
                             $suggestedVersion,
                             date( "d.m.Y" ),
+                            $versionSeparator,
                             shell_exec( $gitLogCommand )
                         );
     }
@@ -147,7 +149,7 @@ function applyChanges( $changes, $oldChanges )
     //exec( "$editor $tempChangesFile" );
     
     file_put_contents( $tempChangesFile, $oldChanges, FILE_APPEND );
-    //exec( "mv $tempChangesFile $changesFile" );
+    exec( "mv $tempChangesFile $changesFile" );
 }
 
 /**
