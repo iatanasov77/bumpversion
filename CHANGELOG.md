@@ -1,3 +1,10 @@
+0.4.2	|	Release date: **12.10.2021**
+============================================
+* New Features:
+  - Move fetching old chencges before call applyChanges function and Detect if Minor Version in applyChanges function.
+  - Fetch changes with reverse to show its how its added.
+
+
 0.4.1	|	Release date: **08.07.2021**
 ============================================
 * Bug Fixes:
