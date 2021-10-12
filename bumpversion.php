@@ -31,13 +31,14 @@ if ( isset( $opt['h'] ) ) { // Display Help
 }
 evalNewVersion( $lastVersion, $suggestedVersion );
 
-$changes    = fetchChanges();
+$oldChanges = file_exists( $changesFile ) ? file_get_contents( $changesFile ) : '';
+$changes    = fetchChanges( $oldChanges );
 if ( isset( $opt['d'] ) ) { // Dry-Run: Only Display Current Version and Changes
     echo $changes;
     exit( 0 );
 }
 
-applyChanges( $changes );
+applyChanges( $changes, $oldChanges );
 file_put_contents( $versionFile, $suggestedVersion );
 
 // Commit VERSION and CHANGELOG.md files
@@ -75,7 +76,7 @@ function evalNewVersion( &$lastVersion, &$suggestedVersion)
     }
 }
 
-function fetchChanges()
+function fetchChanges( &$oldChanges )
 {
     global $changesRowPrefix, $initialVersion, $lastVersion, $suggestedVersion, $tagPrefix, $opt;
     
@@ -101,7 +102,7 @@ function fetchChanges()
     return $changes;
 }
 
-function applyChanges( $changes )
+function applyChanges( $changes, $oldChanges )
 {
     global $tempChangesFile, $changesFile, $editor;
     
@@ -122,8 +123,6 @@ function applyChanges( $changes )
     // Old Way: Not work
     //exec( "$editor $tempChangesFile" );
     
-    
-    $oldChanges     = file_exists( $changesFile ) ? file_get_contents( $changesFile ) : '';
     file_put_contents( $tempChangesFile, $oldChanges, FILE_APPEND );
     exec( "mv $tempChangesFile $changesFile" );
 }
