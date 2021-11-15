@@ -158,7 +158,7 @@ function applyComposerJsonVersion( $newVersion )
     if ( file_exists( 'composer.json' ) ) {
         $json   = json_decode( file_get_contents( 'composer.json' ), true );
         if ( isset( $json['version'] ) ) {
-            $json['version']    = $newVersion;
+            $json['version']    = 'v' . $newVersion;
             file_put_contents( 'composer.json', json_encode( $json, JSON_PRETTY_PRINT ) );
             exec( 'git add composer.json' );
         }
