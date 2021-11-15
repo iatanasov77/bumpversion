@@ -43,6 +43,7 @@ if ( isset( $opt['d'] ) ) { // Dry-Run: Only Display Current Version and Changes
 
 applyChanges( $changes, $oldChanges );
 file_put_contents( $versionFile, $suggestedVersion );
+applyComposerJsonVersion( $suggestedVersion );
 
 // Commit VERSION and CHANGELOG.md files
 exec( sprintf( 'git add %s %s', basename( $versionFile ), basename( $changesFile ) ) );
@@ -150,6 +151,18 @@ function applyChanges( $changes, $oldChanges )
     
     file_put_contents( $tempChangesFile, $oldChanges, FILE_APPEND );
     exec( "mv $tempChangesFile $changesFile" );
+}
+
+function applyComposerJsonVersion( $newVersion )
+{
+    if ( file_exists( 'composer.json' ) ) {
+        $json   = json_decode( file_get_contents( 'composer.json' ), true );
+        if ( isset( $json['version'] ) ) {
+            $json['version']    = $newVersion;
+            file_put_contents( 'composer.json', json_encode( $json, JSON_PRETTY_PRINT ) );
+            exec( 'git add composer.json' );
+        }
+    }
 }
 
 /**
