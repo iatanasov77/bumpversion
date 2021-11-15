@@ -1,3 +1,35 @@
+1.0.0	|	Release date: **12.10.2021**
+============================================
+* New Features:
+  - Create cli option to merge bugfix changes.
+  - Create function to merge New Changes with last version Changes.
+
+
+0.4.2	|	Release date: **12.10.2021**
+============================================
+* New Features:
+  - Move fetching old chencges before call applyChanges function and Detect if Minor Version in applyChanges function.
+  - Fetch changes with reverse to show its how its added.
+
+
+0.4.1	|	Release date: **08.07.2021**
+============================================
+* Bug Fixes:
+  - Not Ask For Version in DryRun Mode.
+
+
+0.4.0	|	Release date: **08.07.2021**
+============================================
+* New Features:
+  - Add Display DryRun Header.
+
+
+0.3.0	|	Release date: **30.03.2021**
+============================================
+* New Features:
+  - Add Command Options Support
+  - Rename Changes file to CHANGELOG.md and code refactoring of the script.
+
 0.2.0	|	Release date: **11.10.2020**
 ============================================
 * New Features:
