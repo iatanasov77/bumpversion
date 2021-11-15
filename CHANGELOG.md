@@ -1,3 +1,9 @@
+1.1.0	|	Release date: **15.11.2021**
+============================================
+* New Features:
+  - Set Version in composer.json file if the version key exists.
+
+
 1.0.0	|	Release date: **12.10.2021**
 ============================================
 * New Features:
