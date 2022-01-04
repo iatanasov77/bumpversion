@@ -1,3 +1,11 @@
+1.2.0	|	Release date: **04.01.2022**
+============================================
+* New Features:
+  - Add 'v' prefix to composer.json
+  - Add Sync Subtree Option.
+  - Add gitflow-reinit Script.
+
+
 1.1.0	|	Release date: **15.11.2021**
 ============================================
 * New Features:
