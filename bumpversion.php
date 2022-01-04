@@ -13,7 +13,7 @@ $changesRowPrefix	= '* ';
 $initialVersion		= '0.0.0';
 $tagPrefix          = 'v';
 $versionSeparator   = '============================================';
-$opt				= getopt( 'dmh' );
+$opt				= getopt( 'dmhs' );
 
 /**
  * SUPPORT VARS PASSED BY REFERENCE
@@ -94,6 +94,13 @@ function fetchChanges()
                             "DryRun ( Display Changes Only )\n%s\n* Commits:\n%s\n\n",
                             $versionSeparator,
                             shell_exec( $gitLogCommand )
+                        );
+    } elseif ( isset( $opt['s'] ) ) {
+        $changes			= sprintf(
+                            "%s\t|\tRelease date: **%s**\n%s\n* Sync With Subtree Library\n\n\n",
+                            $suggestedVersion,
+                            date( "d.m.Y" ),
+                            $versionSeparator
                         );
     } else {
         $changes			= sprintf(
