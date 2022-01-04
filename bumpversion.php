@@ -13,7 +13,7 @@ $changesRowPrefix	= '* ';
 $initialVersion		= '0.0.0';
 $tagPrefix          = 'v';
 $versionSeparator   = '============================================';
-$opt				= getopt( 'dmh' );
+$opt				= getopt( 'dmhs' );
 
 /**
  * SUPPORT VARS PASSED BY REFERENCE
@@ -95,6 +95,13 @@ function fetchChanges()
                             $versionSeparator,
                             shell_exec( $gitLogCommand )
                         );
+    } elseif ( isset( $opt['s'] ) ) {
+        $changes			= sprintf(
+                            "%s\t|\tRelease date: **%s**\n%s\n* Sync With Subtree Library\n\n\n",
+                            $suggestedVersion,
+                            date( "d.m.Y" ),
+                            $versionSeparator
+                        );
     } else {
         $changes			= sprintf(
                             "%s\t|\tRelease date: **%s**\n%s\n* New Features:\n* Bug-Fixes:\n* Commits:\n%s\n\n",
@@ -158,7 +165,7 @@ function applyComposerJsonVersion( $newVersion )
     if ( file_exists( 'composer.json' ) ) {
         $json   = json_decode( file_get_contents( 'composer.json' ), true );
         if ( isset( $json['version'] ) ) {
-            $json['version']    = $newVersion;
+            $json['version']    = 'v' . $newVersion;
             file_put_contents( 'composer.json', json_encode( $json, JSON_PRETTY_PRINT ) );
             exec( 'git add composer.json' );
         }
