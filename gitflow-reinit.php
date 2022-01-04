@@ -46,12 +46,9 @@ function Usage()
 = Usage \n
 ============================ \n
 = \n
-= -a action     Run Action. Allowed: (pull, push). \n
+= -n version    Version for which to create branch
 = \n
-= -v version    Select Branch Version. \n
-= \n
-= \n
-= EXAMPLE: bin/subtree -apush -v1.4 \n
+= gitflow-reinit -n1.5 \n
 ============================================================================================================================================ \n
 ";
 
