@@ -1,3 +1,9 @@
+1.2.1	|	Release date: **10.11.2024**
+============================================
+* Bug-Fixes:
+  - Fix GitflowReinit Usage String.
+
+
 1.2.0	|	Release date: **04.01.2022**
 ============================================
 * New Features:
